@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -27,12 +28,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -136,6 +139,28 @@ fun PlacesScreen(
                 }
             }
 
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                item {
+                    CategoryButton(
+                        text = "Vše",
+                        isSelected = viewState.value.selectedCategoryId == "",
+                        onClick = { viewModel.onCategorySelected("") }
+                    )
+                }
+                items(viewState.value.categories) { category ->
+                    CategoryButton(
+                        text = category.Name,
+                        isSelected = viewState.value.selectedCategoryId == category.Id,
+                        onClick = { viewModel.onCategorySelected(category.Id) }
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(16.dp)) // Přidání mezery
 
             LazyColumn(
@@ -183,7 +208,7 @@ fun PlacesScreen(
 
 
                             Text(
-                                text = "Category",
+                                text = place.Category?.Name ?: "Neznámá kategorie",
                                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -195,6 +220,24 @@ fun PlacesScreen(
     }
 }
 
+@Composable
+fun CategoryButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        shape = RoundedCornerShape(50),
+        modifier = Modifier.height(32.dp),
+        colors = if (isSelected) {
+            ButtonDefaults.outlinedButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White
+            )
+        } else {
+            ButtonDefaults.outlinedButtonColors()
+        }
+    ) {
+        Text(text = text)
+    }
+}
 @Composable
 fun DashedLine() {
     Canvas(

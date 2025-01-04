@@ -7,4 +7,5 @@ data class Place (
     val OpeningHours: String,
     val CategoryId: String,
     val ImageUrl: String,
+    val Category: Category
 )

@@ -6,6 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
+
     private val okHttpClient by lazy{
         OkHttpClient.Builder()
             //.addInterceptor(AuthInterceptor(API_KEY))

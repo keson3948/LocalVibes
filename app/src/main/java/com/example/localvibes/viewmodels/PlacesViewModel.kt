@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.localvibes.api.RetrofitInstance
+import com.example.localvibes.repositories.CategoryRepository
 import com.example.localvibes.repositories.PlaceRepository
 import com.example.localvibes.viewstates.PlacesViewState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 
 class PlacesViewModel : ViewModel() {
     private val PlaceRepository = PlaceRepository(RetrofitInstance.placeApi)
+    private val CategoryRepository = CategoryRepository(RetrofitInstance.placeApi)
 
 
     private val _viewState = MutableStateFlow(PlacesViewState())
@@ -36,8 +38,9 @@ class PlacesViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val places = PlaceRepository.getPlaces()
+                val categories = CategoryRepository.getCategories()
                 _viewState.update {
-                    it.copy(places = places, isLoading = false)
+                    it.copy(places = places, isLoading = false, categories = categories)
                 }
                 Log.d("PlacesViewModel", "Places received: $places")
             } catch (e: Exception) {
@@ -49,15 +52,60 @@ class PlacesViewModel : ViewModel() {
         }
     }
 
+    fun onCategorySelected(categoryId: String) {
+        _viewState.update {
+            it.copy(selectedCategoryId = categoryId)
+        }
+        if(categoryId == ""){
+            getPlacesFromApi()
+        }
+        else{
+            searchByCategory(categoryId)
+        }
+    }
+
+    fun searchByCategory(categoryId: String){
+        viewModelScope.launch {
+            try {
+                val places = PlaceRepository.searchByCategory(categoryId)
+                _viewState.update {
+                    it.copy(places = places)
+                }
+                Log.d("PlacesViewModel", "Places received: $places")
+            } catch (e: Exception) {
+                Log.e("PlacesViewModel", "Error fetching places: ${e.message}")
+            }
+        }
+    }
+
 
     fun onSearchChange(query: String){
         _viewState.update {
             it.copy(search = query)
         }
+        if (query == ""){
+            getPlacesFromApi()
+        }
     }
 
     fun searchPlaces(){
-
+        val query = viewState.value.search
+        if(query == ""){
+            getPlacesFromApi()
+        }
+        else{
+            viewModelScope.launch {
+                try {
+                    val places = PlaceRepository.searchPlaces(query)
+                    _viewState.update {
+                        it.copy(places = places)
+                    }
+                    Log.d("PlacesViewModel", "Places received: $places")
+                } catch (e: Exception) {
+                    Log.e("PlacesViewModel", "Error fetching places: ${e.message}")
+                }
+            }
+        }
     }
 
 }
