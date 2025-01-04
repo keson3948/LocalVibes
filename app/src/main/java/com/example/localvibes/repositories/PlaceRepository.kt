@@ -20,4 +20,8 @@ class PlaceRepository(private val placeApi: PlaceApi) {
     suspend fun searchByCategory(categoryId: String): List<Place> {
         return placeApi.searchByCategory(categoryId)
     }
+
+    suspend fun searchByNameAndCategory(query: String, categoryId: String): List<Place> {
+        return placeApi.searchByNameAndCategory(query, categoryId)
+    }
 }

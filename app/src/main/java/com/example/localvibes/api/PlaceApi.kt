@@ -34,4 +34,10 @@ interface PlaceApi {
     suspend fun searchByCategory(
         @Path("categoryId") categoryId: String
     ): List<Place>
+
+    @GET("Place/byCategoryAndName")
+    suspend fun searchByNameAndCategory(
+        @Query("name") query: String,
+        @Query("categoryId") categoryId: String
+    ): List<Place>
 }

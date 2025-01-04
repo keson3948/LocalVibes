@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -27,11 +28,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,6 +63,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.localvibes.R
 import com.example.localvibes.viewmodels.PlacesViewModel
 
@@ -80,6 +85,14 @@ fun PlacesScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors().copy()
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { /* Handle FAB click */ }) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add"
+                )
+            }
         }
     ) { innerPadding ->
         Column (
@@ -169,49 +182,73 @@ fun PlacesScreen(
                     .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(viewState.value.places) { place ->
-                    Card (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                navController?.navigate("PlaceDetailScreen/${place.Id}")
-                            },
-                        elevation = CardDefaults.cardElevation(3.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White
-                        ),
-                    ){
-                        Column (
-                            modifier = Modifier.wrapContentHeight()
+                if (viewState.value.places.isEmpty()) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.placehorder),
-                                contentDescription = "Placeholder",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(100.dp), // Nastavení pevné výšky
-                                contentScale = ContentScale.Crop // Zachování poměru stran
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "No places found",
+                                modifier = Modifier.size(64.dp),
+                                tint = Color.Gray
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = place.Name,
-                                modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp),
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.titleMedium
+                                text = "Žádná místa nebyla nalezena",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray
                             )
-                            Text(
-                                text = "Description",
-                                modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 8.dp),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                        }
+                    }
+                } else {
+                    items(viewState.value.places) { place ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    navController?.navigate("PlaceDetailScreen/${place.Id}")
+                                },
+                            elevation = CardDefaults.cardElevation(3.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                        ) {
+                            Column(
+                                modifier = Modifier.wrapContentHeight()
+                            ) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(model = place.ImageUrl),
+                                    contentDescription = "Placeholder",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(100.dp), // Nastavení pevné výšky
+                                    contentScale = ContentScale.Crop // Zachování poměru stran
+                                )
+                                Text(
+                                    text = place.Name,
+                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp),
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    text = "Description",
+                                    modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 8.dp),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
 
-                            DashedLine()
+                                DashedLine()
 
-
-                            Text(
-                                text = place.Category?.Name ?: "Neznámá kategorie",
-                                modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                                Text(
+                                    text = place.Category?.Name ?: "Neznámá kategorie",
+                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
                         }
                     }
                 }
