@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 object RetrofitInstance {
     private val okHttpClient by lazy{
         OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(API_KEY))
+            //.addInterceptor(AuthInterceptor(API_KEY))
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
             .build()

@@ -1,11 +1,10 @@
 package com.example.localvibes.viewstates
 
-import kotlinx.coroutines.flow.Flow
+import com.example.localvibes.models.Place
 
 data class PlacesViewState(
     val isLoading: Boolean = false,
-    val places: List<String> = emptyList(),
+    val places: List<Place> = emptyList(),
 
-    val snackbarMessage: Flow<String>? = null,
     val search: String = ""
 )

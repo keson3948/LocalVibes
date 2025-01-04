@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 
 class PlacesViewModel : ViewModel() {
     private val PlaceRepository = PlaceRepository(RetrofitInstance.placeApi)
-    private val _snackbarMessage = chanel<String>()
 
 
     private val _viewState = MutableStateFlow(PlacesViewState())
@@ -22,29 +21,34 @@ class PlacesViewModel : ViewModel() {
 
     init {
         _viewState.value = PlacesViewState(isLoading = true)
-        fetchPlaces()
+        //fetchPlaces()
+        getPlacesFromApi()
     }
 
     fun fetchPlaces() {
         val list = listOf("Place 1", "Place 2", "Place 3")
-        _viewState.update {
-            it.copy(places = list, isLoading = false)
-        }
+        //_viewState.update {
+         //   it.copy(places = list, isLoading = false)
+        //}
     }
 
-    private fun getPlacesFromApi(){
+    private fun getPlacesFromApi() {
         viewModelScope.launch {
             try {
                 val places = PlaceRepository.getPlaces()
                 _viewState.update {
-                    it.copy(places = places)
+                    it.copy(places = places, isLoading = false)
                 }
-            } catch (e: Exception){
+                Log.d("PlacesViewModel", "Places received: $places")
+            } catch (e: Exception) {
                 Log.e("PlacesViewModel", "Error fetching places: ${e.message}")
+                _viewState.update {
+                    it.copy(isLoading = false)
+                }
             }
-
         }
     }
+
 
     fun onSearchChange(query: String){
         _viewState.update {

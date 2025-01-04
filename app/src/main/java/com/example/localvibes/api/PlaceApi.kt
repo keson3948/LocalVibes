@@ -7,8 +7,8 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface PlaceApi {
-    @GET("places")
-    suspend fun getPlaces(): List<String>
+    @GET("Place")
+    suspend fun getPlaces(): List<Place>
 
     @GET("places/search")
     suspend fun searchPlaces(
