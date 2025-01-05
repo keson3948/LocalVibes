@@ -2,6 +2,7 @@ package com.example.localvibes.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -10,11 +11,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Label
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
@@ -31,11 +36,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -47,7 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.example.localvibes.models.Review
+import com.example.localvibes.ui.components.AddReviewDialog
 import com.example.localvibes.ui.components.NavigationBackButton
+import com.example.localvibes.ui.components.NotFoundTextIcon
 import com.example.localvibes.viewmodels.PlaceDetailViewModel
 import com.example.localvibes.viewstates.PlaceDetailViewState
 
@@ -64,6 +74,7 @@ fun PlaceDetailScreen(
     }
 
     val viewState = placeDetailViewModel.viewState.collectAsState().value
+    val isDialogOpen by placeDetailViewModel.isDialogOpen
 
     Scaffold(
         topBar = {
@@ -78,152 +89,172 @@ fun PlaceDetailScreen(
                             navController?.popBackStack()
                         }
                     )
-                },
-                /*actions = {
-                    IconButton(onClick = { /* Handle heart icon click */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = "Favorite"
-                        )
-                    }
-                }*/
+                }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Handle FAB click */ }) {
+            FloatingActionButton(onClick = { placeDetailViewModel.isDialogOpen.value = true }) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add"
                 )
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = placeDetailViewModel.snackbarHostState)
         }
     ) { innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            viewState.place?.let { place ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(place.ImageUrl),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+            item {
+                viewState.place?.let { place ->
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, Color.Black),
-                                    startY = 0f,
-                                    endY = 400f
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    ) {
+                        Image(
+                            painter = rememberAsyncImagePainter(place.ImageUrl),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    brush = Brush.verticalGradient(
+                                        colors = listOf(Color.Transparent, Color.Black),
+                                        startY = 0f,
+                                        endY = 400f
+                                    )
                                 )
-                            )
-                    )
-                    Text(
-                        text = place.Name,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleLarge.copy(color = Color.White),
+                        )
+                        Text(
+                            text = place.Name,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge.copy(color = Color.White),
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .align(Alignment.BottomStart)
+                        )
+                    }
+
+                    Column(
                         modifier = Modifier
+                            .fillMaxWidth()
                             .padding(16.dp)
-                            .align(Alignment.BottomStart)
-                    )
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "Description Icon",
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+                                    Text(
+                                        text = "O podniku",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Text(
+                                    text = place.Description ?: "Žádný popis",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Rounded.Label,
+                                        contentDescription = "Category Icon",
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+                                    Text(
+                                        text = place.Category.Name,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.LocationOn,
+                                        contentDescription = "Location Icon",
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+                                    Text(
+                                        text = place.Address,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Info,
-                                    contentDescription = "Description Icon",
-                                    modifier = Modifier.padding(end = 8.dp)
-                                )
-                                Text(
-                                    text = "Description",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            Text(
-                                text = place.ImageUrl,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Rounded.Label,
-                                    contentDescription = "Category Icon",
-                                    modifier = Modifier.padding(end = 8.dp)
-                                )
-                                Text(
-                                    text = place.Category.Name,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.LocationOn,
-                                    contentDescription = "Location Icon",
-                                    modifier = Modifier.padding(end = 8.dp)
-                                )
-                                Text(
-                                    text = place.Address,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
-                    }
-                }
+                DashedLine()
             }
 
-            DashedLine()
+            item {
+                ReviewSection(
+                    reviews = viewState.reviews,
+                    onEditClick = { review ->
+                        // Handle edit action
+                    },
+                    onDeleteClick = { review ->
+                        // Handle delete action
+                    }
+                )
+            }
+        }
 
-            ReviewSection()
+        if (isDialogOpen) {
+            AddReviewDialog(
+                onDismiss = { placeDetailViewModel.isDialogOpen.value = false },
+                onConfirm = { review ->
+                    placeDetailViewModel.addReview(review)
+                }
+            )
         }
     }
 }
 
 @Composable
-fun ReviewSection() {
+fun ReviewSection(
+    reviews: List<Review>,
+    onEditClick: (Review) -> Unit,
+    onDeleteClick: (Review) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,16 +266,31 @@ fun ReviewSection() {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        ReviewItem(
-            name = "John Doe",
-            reviewText = "Great place! Had an amazing time.",
-            rating = 3
-        )
+
+        if (reviews.isEmpty()) {
+            NotFoundTextIcon("Žádné recenze")
+        } else {
+            reviews.forEach { review ->
+                ReviewItem(
+                    name = review.ReviewerName,
+                    reviewText = review.ReviewText,
+                    rating = review.Rating,
+                    onEditClick = { onEditClick(review) },
+                    onDeleteClick = { onDeleteClick(review) }
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun ReviewItem(name: String, reviewText: String, rating: Int) {
+fun ReviewItem(
+    name: String,
+    reviewText: String,
+    rating: Int,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -270,6 +316,17 @@ fun ReviewItem(name: String, reviewText: String, rating: Int) {
                     tint = Color.Black,
                     modifier = Modifier.size(20.dp)
                 )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(onClick = onEditClick) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+            }
+            IconButton(onClick = onDeleteClick) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
             }
         }
     }

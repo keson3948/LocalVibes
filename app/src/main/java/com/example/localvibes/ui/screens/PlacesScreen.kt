@@ -236,7 +236,7 @@ fun PlacesScreen(
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
-                                    text = "Description",
+                                    text = place.Description?:"Žádný popis",
                                     modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 8.dp),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
