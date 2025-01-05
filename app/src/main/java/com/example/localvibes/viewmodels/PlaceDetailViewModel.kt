@@ -73,7 +73,7 @@ class PlaceDetailViewModel : ViewModel() {
                         it.copy(reviews = listOf(reviewWithPlaceId) + it.reviews)
                     }
                     snackbarHostState.showSnackbar(
-                        message = "Review successfully added",
+                        message = "Recenze byla úspěšně přidána",
                         duration = SnackbarDuration.Short
                     )
                 } else {
@@ -83,5 +83,40 @@ class PlaceDetailViewModel : ViewModel() {
                 Log.e("PlaceDetailViewModel", "Exception adding review: ${e.message}")
             }
         }
+    }
+
+    fun deleteReview(review: Review) {
+        viewModelScope.launch {
+            try {
+                ReviewRepository.deleteReview(review.Id)
+                _viewState.update {
+                    it.copy(reviews = it.reviews.filterNot { it.Id == review.Id })
+                }
+                snackbarHostState.showSnackbar(
+                    message = "Recenze byla úspěšně smazána",
+                    duration = SnackbarDuration.Short
+                )
+            } catch (e: Exception) {
+                Log.e("PlaceDetailViewModel", "Exception deleting review: ${e.message}")
+            }
+        }
+    }
+
+    val isDeleteDialogOpen = mutableStateOf(false)
+    var reviewToDelete: Review? = null
+
+    fun showDeleteDialog(review: Review) {
+        reviewToDelete = review
+        isDeleteDialogOpen.value = true
+    }
+
+    fun confirmDeleteReview() {
+        reviewToDelete?.let { deleteReview(it) }
+        isDeleteDialogOpen.value = false
+    }
+
+    fun dismissDeleteDialog() {
+        reviewToDelete = null
+        isDeleteDialogOpen.value = false
     }
 }

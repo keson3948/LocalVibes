@@ -56,6 +56,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.localvibes.models.Review
 import com.example.localvibes.ui.components.AddReviewDialog
+import com.example.localvibes.ui.components.DeleteReviewDialog
 import com.example.localvibes.ui.components.NavigationBackButton
 import com.example.localvibes.ui.components.NotFoundTextIcon
 import com.example.localvibes.viewmodels.PlaceDetailViewModel
@@ -232,7 +233,7 @@ fun PlaceDetailScreen(
                         // Handle edit action
                     },
                     onDeleteClick = { review ->
-                        // Handle delete action
+                        placeDetailViewModel.showDeleteDialog(review)
                     }
                 )
             }
@@ -244,6 +245,13 @@ fun PlaceDetailScreen(
                 onConfirm = { review ->
                     placeDetailViewModel.addReview(review)
                 }
+            )
+        }
+
+        if (placeDetailViewModel.isDeleteDialogOpen.value) {
+            DeleteReviewDialog (
+                onDismiss = { placeDetailViewModel.dismissDeleteDialog() },
+                onConfirm = { placeDetailViewModel.confirmDeleteReview() }
             )
         }
     }

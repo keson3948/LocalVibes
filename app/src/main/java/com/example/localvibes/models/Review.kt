@@ -1,7 +1,7 @@
 package com.example.localvibes.models
 
 data class Review(
-    val id: String,
+    val Id: String,
     val PlaceId: String,
     val ReviewerName: String,
     val Rating: Int,

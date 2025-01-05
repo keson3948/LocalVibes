@@ -14,12 +14,11 @@ class ReviewRepository (private val placeApi: PlaceApi) {
         return placeApi.addReview(review)
     }
 
+    suspend fun deleteReview(reviewId: String) {
+        return placeApi.deleteReview(reviewId)
+    }
+
     /*
-
-
-        suspend fun deleteReview(reviewId: String) {
-            return placeApi.deleteReview(reviewId)
-        }
 
         suspend fun updateReview(reviewId: String, reviewerName: String, rating: Int, reviewText: String) {
             return placeApi.updateReview(reviewId, reviewerName, rating, reviewText)

@@ -5,6 +5,7 @@ import com.example.localvibes.models.Place
 import com.example.localvibes.models.Review
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -52,4 +53,9 @@ interface PlaceApi {
     suspend fun addReview(
         @Body review: Review
     ) : Response<Review>
+
+    @DELETE("Review/delete/{reviewId}")
+    suspend fun deleteReview(
+        @Path("reviewId") reviewId: String
+    )
 }

@@ -60,12 +60,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.localvibes.R
+import com.example.localvibes.ui.components.NotFoundTextIcon
 import com.example.localvibes.viewmodels.PlacesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -184,26 +186,7 @@ fun PlacesScreen(
             ) {
                 if (viewState.value.places.isEmpty()) {
                     item {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "No places found",
-                                modifier = Modifier.size(64.dp),
-                                tint = Color.Gray
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = "Žádná místa nebyla nalezena",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.Gray
-                            )
-                        }
+                        NotFoundTextIcon("Nebyly nalezeny žádné výsledky")
                     }
                 } else {
                     items(viewState.value.places) { place ->
@@ -238,7 +221,9 @@ fun PlacesScreen(
                                 Text(
                                     text = place.Description?:"Žádný popis",
                                     modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 8.dp),
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
 
                                 DashedLine()
