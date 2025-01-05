@@ -1,5 +1,6 @@
 package com.example.localvibes.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -54,6 +55,7 @@ import com.example.localvibes.ui.components.NavigationBackButton
 import com.example.localvibes.ui.components.NotFoundTextIcon
 import com.example.localvibes.viewmodels.PlaceDetailViewModel
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceDetailScreen(

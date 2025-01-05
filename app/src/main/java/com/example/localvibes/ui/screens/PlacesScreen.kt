@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.localvibes.ui.components.NotFoundTextIcon
+import com.example.localvibes.ui.components.PlaceCard
 import com.example.localvibes.viewmodels.PlacesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -190,65 +191,8 @@ fun PlacesScreen(
                         }
                     } else {
                         items(viewState.value.places) { place ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController?.navigate("PlaceDetailScreen/${place.Id}")
-                                    },
-                                elevation = CardDefaults.cardElevation(3.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.White
-                                ),
-                            ) {
-                                Column(
-                                    modifier = Modifier.wrapContentHeight()
-                                ) {
-                                    Image(
-                                        painter = rememberAsyncImagePainter(model = place.ImageUrl),
-                                        contentDescription = "Placeholder",
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(100.dp), // Nastavení pevné výšky
-                                        contentScale = ContentScale.Crop // Zachování poměru stran
-                                    )
-                                    Text(
-                                        text = place.Name,
-                                        modifier = Modifier.padding(
-                                            start = 16.dp,
-                                            top = 8.dp,
-                                            end = 16.dp,
-                                            bottom = 4.dp
-                                        ),
-                                        fontWeight = FontWeight.Bold,
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                    Text(
-                                        text = place.Description ?: "Žádný popis",
-                                        modifier = Modifier.padding(
-                                            start = 16.dp,
-                                            top = 4.dp,
-                                            end = 16.dp,
-                                            bottom = 8.dp
-                                        ),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-
-                                    DashedLine()
-
-                                    Text(
-                                        text = place.Category?.Name ?: "Neznámá kategorie",
-                                        modifier = Modifier.padding(
-                                            start = 16.dp,
-                                            top = 8.dp,
-                                            end = 16.dp,
-                                            bottom = 16.dp
-                                        ),
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
+                            PlaceCard (place = place) { placeId ->
+                                navController?.navigate("PlaceDetailScreen/$placeId")
                             }
                         }
                     }
