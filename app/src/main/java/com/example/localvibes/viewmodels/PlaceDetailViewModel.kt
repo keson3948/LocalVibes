@@ -28,7 +28,7 @@ class PlaceDetailViewModel : ViewModel() {
 
     private val _viewState = MutableStateFlow(PlaceDetailViewState(""))
     val viewState : StateFlow<PlaceDetailViewState> = _viewState.asStateFlow()
-
+    val isLoading = mutableStateOf(false)
     val isDialogOpen = mutableStateOf(false)
 
     fun setPlaceId(placeId: String) {
@@ -39,6 +39,7 @@ class PlaceDetailViewModel : ViewModel() {
 
     fun initLoad(placeId: String) {
         setPlaceId(placeId)
+        isLoading.value = true
 
         viewModelScope.launch {
             try {
@@ -50,6 +51,9 @@ class PlaceDetailViewModel : ViewModel() {
                 Log.d("PlaceDetailViewModel", "Place received: $place")
             } catch (e: Exception) {
                 Log.e("PlaceDetailViewModel", "Error fetching place: ${e.message}")
+            }
+            finally {
+                isLoading.value = false
             }
         }
     }
@@ -63,14 +67,15 @@ class PlaceDetailViewModel : ViewModel() {
 
 
     fun addReview(review: Review) {
-        val reviewWithPlaceId = review.copy(PlaceId = _viewState.value.placeId)
-        Log.d("PlaceDetailViewModel", "Adding review: $reviewWithPlaceId")
         viewModelScope.launch {
             try {
+                val reviewWithPlaceId = review.copy(PlaceId = _viewState.value.placeId)
+                Log.d("PlaceDetailViewModel", "Adding review: $reviewWithPlaceId")
                 val response = ReviewRepository.addReview(reviewWithPlaceId)
                 if (response.isSuccessful) {
+                    val reviews = ReviewRepository.getReviews(_viewState.value.placeId)
                     _viewState.update {
-                        it.copy(reviews = listOf(reviewWithPlaceId) + it.reviews)
+                        it.copy(reviews = reviews)
                     }
                     snackbarHostState.showSnackbar(
                         message = "Recenze byla úspěšně přidána",
@@ -118,5 +123,38 @@ class PlaceDetailViewModel : ViewModel() {
     fun dismissDeleteDialog() {
         reviewToDelete = null
         isDeleteDialogOpen.value = false
+    }
+
+    val isEditDialogOpen = mutableStateOf(false)
+    var reviewToEdit: Review? = null
+
+    fun showEditDialog(review: Review) {
+        reviewToEdit = review
+        isEditDialogOpen.value = true
+    }
+
+    fun dismissEditDialog() {
+        reviewToEdit = null
+        isEditDialogOpen.value = false
+    }
+
+    fun updateReview(review: Review) {
+        viewModelScope.launch {
+            try {
+            ReviewRepository.updateReview(review)
+                _viewState.update {
+                    it.copy(reviews = it.reviews.map {
+                        if (it.Id == review.Id) review else it
+                    })
+                }
+                snackbarHostState.showSnackbar(
+                    message = "Recenze byla úspěšně upravena",
+                    duration = SnackbarDuration.Short
+                )
+            } catch (e: Exception) {
+                Log.e("PlaceDetailViewModel", "Exception updating review: ${e.message}")
+            }
+        }
+        dismissEditDialog()
     }
 }

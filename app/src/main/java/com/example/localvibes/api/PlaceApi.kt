@@ -8,6 +8,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -57,5 +58,11 @@ interface PlaceApi {
     @DELETE("Review/delete/{reviewId}")
     suspend fun deleteReview(
         @Path("reviewId") reviewId: String
+    )
+
+    @PUT("Review/{reviewId}")
+    suspend fun updateReview(
+        @Path("reviewId") reviewId: String,
+        @Body review: Review
     )
 }

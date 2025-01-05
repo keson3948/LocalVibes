@@ -10,31 +10,32 @@ import com.example.localvibes.models.Review
 @Composable
 fun AddReviewDialog(
     onDismiss: () -> Unit,
-    onConfirm: (Review) -> Unit
+    onConfirm: (Review) -> Unit,
+    existingReview: Review? = null
 ) {
-    var name by remember { mutableStateOf("") }
-    var reviewText by remember { mutableStateOf("") }
-    var rating by remember { mutableStateOf(0) }
+    var name by remember { mutableStateOf(existingReview?.ReviewerName ?: "") }
+    var reviewText by remember { mutableStateOf(existingReview?.ReviewText ?: "") }
+    var rating by remember { mutableStateOf(existingReview?.Rating ?: 0) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Review") },
+        title = { Text(if (existingReview == null) "Přidat recenzi" else "Upravit recenzi") },
         text = {
             Column {
                 TextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name") }
+                    label = { Text("Jméno") }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = reviewText,
                     onValueChange = { reviewText = it },
-                    label = { Text("Review") }
+                    label = { Text("Recenze") }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row {
-                    Text("Rating: ")
+                    Text("Hodnocení: ")
                     Slider(
                         value = rating.toFloat(),
                         onValueChange = { rating = it.toInt() },
@@ -46,15 +47,15 @@ fun AddReviewDialog(
         },
         confirmButton = {
             TextButton(onClick = {
-                onConfirm(Review("", "", name, rating, reviewText, null))
+                onConfirm(Review(existingReview?.Id ?: "", existingReview?.PlaceId ?: "", name, rating, reviewText, null))
                 onDismiss()
             }) {
-                Text("Add")
+                Text(if (existingReview == null) "Přidat" else "Uložit")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Zrušit")
             }
         }
     )

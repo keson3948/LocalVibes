@@ -1,6 +1,7 @@
 package com.example.localvibes.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.localvibes.api.RetrofitInstance
@@ -20,6 +21,7 @@ class PlacesViewModel : ViewModel() {
 
     private val _viewState = MutableStateFlow(PlacesViewState())
     val viewState : StateFlow<PlacesViewState> = _viewState.asStateFlow()
+    val isLoading = mutableStateOf(false)
 
     init {
         _viewState.value = PlacesViewState(isLoading = true)
@@ -35,6 +37,7 @@ class PlacesViewModel : ViewModel() {
     }
 
     private fun getPlacesFromApi() {
+        isLoading.value = true
         viewModelScope.launch {
             try {
                 val places = PlaceRepository.getPlaces()
@@ -48,6 +51,9 @@ class PlacesViewModel : ViewModel() {
                 _viewState.update {
                     it.copy(isLoading = false)
                 }
+            }
+            finally {
+                isLoading.value = false
             }
         }
     }
@@ -117,6 +123,7 @@ class PlacesViewModel : ViewModel() {
     }
 
     fun searchPlaces(){
+        isLoading.value = true
         val query = viewState.value.search
         if(viewState.value.selectedCategoryId != ""){
             searchByNameAndCategory()
@@ -134,6 +141,9 @@ class PlacesViewModel : ViewModel() {
                     Log.d("PlacesViewModel", "Places received: $places")
                 } catch (e: Exception) {
                     Log.e("PlacesViewModel", "Error fetching places: ${e.message}")
+                }
+                finally {
+                    isLoading.value = false
                 }
             }
         }
