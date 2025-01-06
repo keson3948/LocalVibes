@@ -50,6 +50,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.localvibes.models.Review
 import com.example.localvibes.ui.components.AddReviewDialog
+import com.example.localvibes.ui.components.DeletePlaceDialog
 import com.example.localvibes.ui.components.DeleteReviewDialog
 import com.example.localvibes.ui.components.NavigationBackButton
 import com.example.localvibes.ui.components.NotFoundTextIcon
@@ -85,6 +86,16 @@ fun PlaceDetailScreen(
                             navController?.popBackStack()
                         }
                     )
+                },
+                actions = {
+                    IconButton(onClick = {
+                        navController?.navigate("addPlaceScreen/${placeId}")
+                    }) {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                    }
+                    IconButton(onClick = { placeDetailViewModel.showDeletePlaceDialog() }) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                    }
                 }
             )
         },
@@ -208,7 +219,7 @@ fun PlaceDetailScreen(
                                             modifier = Modifier.padding(end = 8.dp)
                                         )
                                         Text(
-                                            text = place.Category.Name,
+                                            text = place.Category?.Name ?: "Žádná kategorie",
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                     }
@@ -287,6 +298,16 @@ fun PlaceDetailScreen(
             )
         }
 
+        if (placeDetailViewModel.isDeletePlaceDialogOpen.value) {
+            DeletePlaceDialog(
+                onDismiss = { placeDetailViewModel.dismissDeletePlaceDialog() },
+                onConfirm = {
+                    placeDetailViewModel.deletePlace(placeId) {
+                        navController?.popBackStack()
+                    }
+                }
+            )
+        }
 
     }
 }

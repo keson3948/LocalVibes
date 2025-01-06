@@ -9,5 +9,7 @@ data class PlacesViewState(
     val categories: List<Category> = emptyList(),
 
     val selectedCategoryId: String = "",
-    val search: String = ""
+    val search: String = "",
+
+    val isResumed: Boolean = false,
 )

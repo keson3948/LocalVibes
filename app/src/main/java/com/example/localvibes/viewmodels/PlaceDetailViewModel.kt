@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarDuration
+import com.example.localvibes.models.Place
 
 class PlaceDetailViewModel : ViewModel() {
     private val PlaceRepository = PlaceRepository(RetrofitInstance.placeApi)
@@ -138,6 +139,16 @@ class PlaceDetailViewModel : ViewModel() {
         isEditDialogOpen.value = false
     }
 
+    val isDeletePlaceDialogOpen = mutableStateOf(false)
+
+    fun showDeletePlaceDialog() {
+        isDeletePlaceDialogOpen.value = true
+    }
+
+    fun dismissDeletePlaceDialog() {
+        isDeletePlaceDialogOpen.value = false
+    }
+
     fun updateReview(review: Review) {
         viewModelScope.launch {
             try {
@@ -157,4 +168,17 @@ class PlaceDetailViewModel : ViewModel() {
         }
         dismissEditDialog()
     }
+
+    fun deletePlace(placeId: String, onNavigateBack: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                PlaceRepository.deletePlace(placeId)
+                onNavigateBack()
+            } catch (e: Exception) {
+                Log.e("PlaceDetailViewModel", "Exception deleting place: ${e.message}")
+            }
+        }
+        dismissDeletePlaceDialog()
+    }
+
 }

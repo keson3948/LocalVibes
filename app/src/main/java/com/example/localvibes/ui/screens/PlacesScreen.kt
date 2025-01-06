@@ -1,5 +1,6 @@
 package com.example.localvibes.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -39,8 +40,13 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -54,10 +60,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.localvibes.ui.components.NotFoundTextIcon
 import com.example.localvibes.ui.components.PlaceCard
+import com.example.localvibes.viewmodels.AddPlaceViewModel
+import com.example.localvibes.viewmodels.MainScreenEvent
 import com.example.localvibes.viewmodels.PlacesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,6 +79,15 @@ fun PlacesScreen(
     val focusManager = LocalFocusManager.current
     val isLoading by viewModel.isLoading
 
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.onEvent(MainScreenEvent.SetIsResumed(true))
+        }
+    }
+    if (viewState.value.isResumed) {
+        viewModel.onEvent(MainScreenEvent.ResumeReload)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -80,7 +98,7 @@ fun PlacesScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Handle FAB click */ }) {
+            FloatingActionButton(onClick = { navController?.navigate("AddPlaceScreen/")  }) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add"

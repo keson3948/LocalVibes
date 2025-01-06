@@ -2,8 +2,10 @@ package com.example.localvibes.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.localvibes.api.RetrofitInstance
 import com.example.localvibes.repositories.CategoryRepository
 import com.example.localvibes.repositories.PlaceRepository
@@ -29,14 +31,7 @@ class PlacesViewModel : ViewModel() {
         getPlacesFromApi()
     }
 
-    fun fetchPlaces() {
-        val list = listOf("Place 1", "Place 2", "Place 3")
-        //_viewState.update {
-         //   it.copy(places = list, isLoading = false)
-        //}
-    }
-
-    private fun getPlacesFromApi() {
+    fun getPlacesFromApi() {
         isLoading.value = true
         viewModelScope.launch {
             try {
@@ -83,6 +78,8 @@ class PlacesViewModel : ViewModel() {
                 Log.d("PlacesViewModel", "Places received: $places")
             } catch (e: Exception) {
                 Log.e("PlacesViewModel", "Error fetching places: ${e.message}")
+            }finally {
+                isLoading.value = false
             }
         }
     }
@@ -103,12 +100,15 @@ class PlacesViewModel : ViewModel() {
             viewModelScope.launch {
                 try {
                     val places = PlaceRepository.searchByNameAndCategory(query, categoryId)
+                    Log.d("PlacesViewModel", "Places received: $places")
                     _viewState.update {
                         it.copy(places = places)
                     }
                     Log.d("PlacesViewModel", "Places received: $places")
                 } catch (e: Exception) {
                     Log.e("PlacesViewModel", "Error fetching places: ${e.message}")
+                }finally {
+                    isLoading.value = false
                 }
             }
         }
@@ -145,6 +145,18 @@ class PlacesViewModel : ViewModel() {
                 finally {
                     isLoading.value = false
                 }
+            }
+        }
+    }
+
+    fun onEvent(event: MainScreenEvent) {
+        when (event) {
+            is MainScreenEvent.SetIsResumed -> {
+                _viewState.update { it.copy(isResumed = event.isResumed) }
+            }
+            MainScreenEvent.ResumeReload -> {
+                getPlacesFromApi()
+                _viewState.update { it.copy(isResumed = false, search = "", selectedCategoryId = "") }
             }
         }
     }

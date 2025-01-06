@@ -22,6 +22,18 @@ class PlaceRepository(private val placeApi: PlaceApi) {
     }
 
     suspend fun searchByNameAndCategory(query: String, categoryId: String): List<Place> {
-        return placeApi.searchByNameAndCategory(query, categoryId)
+        return placeApi.searchByNameAndCategory(categoryId,query)
+    }
+
+    suspend fun addPlace(place: Place): Place {
+        return placeApi.addPlace(place)
+    }
+
+    suspend fun deletePlace(id: String) {
+        return placeApi.deletePlace(id)
+    }
+
+    suspend fun updatePlace(place: Place) {
+        return placeApi.updatePlace(place.Id, place)
     }
 }

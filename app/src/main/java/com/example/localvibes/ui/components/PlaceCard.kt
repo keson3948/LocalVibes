@@ -71,7 +71,7 @@ fun PlaceCard(place: Place, onClick: (String) -> Unit) {
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = place.Category.Name,
+                    text = place.Category?.Name ?: "No category",
                     modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 16.dp, bottom = 4.dp),
                     style = MaterialTheme.typography.bodySmall
                 )

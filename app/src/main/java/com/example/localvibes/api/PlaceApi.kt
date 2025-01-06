@@ -41,8 +41,8 @@ interface PlaceApi {
 
     @GET("Place/byCategoryAndName")
     suspend fun searchByNameAndCategory(
-        @Query("name") query: String,
-        @Query("categoryId") categoryId: String
+        @Query("categoryId") categoryId: String,
+        @Query("name") query: String
     ): List<Place>
 
     @GET("Review/place/{placeId}")
@@ -64,5 +64,21 @@ interface PlaceApi {
     suspend fun updateReview(
         @Path("reviewId") reviewId: String,
         @Body review: Review
+    )
+
+    @POST("Place")
+    suspend fun addPlace(
+        @Body place: Place
+    ): Place
+
+    @DELETE("Place/{id}")
+    suspend fun deletePlace(
+        @Path("id") id: String
+    )
+
+    @PUT("Place/{id}")
+    suspend fun updatePlace(
+        @Path("id") id: String,
+        @Body place: Place
     )
 }
