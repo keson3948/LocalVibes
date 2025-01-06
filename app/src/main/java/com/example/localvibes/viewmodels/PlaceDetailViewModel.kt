@@ -67,8 +67,15 @@ class PlaceDetailViewModel : ViewModel() {
 
 
 
-    fun addReview(review: Review) {
+     fun addReview(review: Review) {
         viewModelScope.launch {
+            if(review.ReviewerName.isEmpty() || review.ReviewText.isEmpty()) {
+                snackbarHostState.showSnackbar(
+                    message = "Všechna pole musí být vyplněna",
+                    duration = SnackbarDuration.Short
+                )
+                return@launch
+            }
             try {
                 val reviewWithPlaceId = review.copy(PlaceId = _viewState.value.placeId)
                 Log.d("PlaceDetailViewModel", "Adding review: $reviewWithPlaceId")
@@ -151,6 +158,13 @@ class PlaceDetailViewModel : ViewModel() {
 
     fun updateReview(review: Review) {
         viewModelScope.launch {
+            if(review.ReviewerName.isEmpty() || review.ReviewText.isEmpty()) {
+                snackbarHostState.showSnackbar(
+                    message = "Všechna pole musí být vyplněna",
+                    duration = SnackbarDuration.Short
+                )
+                return@launch
+            }
             try {
             ReviewRepository.updateReview(review)
                 _viewState.update {
