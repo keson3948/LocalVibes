@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.rememberNavController
 import com.example.localvibes.ui.theme.LocalVibesTheme
@@ -25,6 +26,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var addPlaceViewModel: AddPlaceViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
         placesViewModel = ViewModelProvider(this)[PlacesViewModel::class.java]
@@ -37,6 +40,12 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 AppNavGraph(navController, placesViewModel, placeDetailViewModel, addPlaceViewModel)
             }
+        }
+
+        splashScreen.setKeepOnScreenCondition {
+            // Dočasně udržte splash screen po 2 sekundách pro testování
+            Thread.sleep(2000)
+            false
         }
     }
 }

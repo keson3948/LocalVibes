@@ -1,6 +1,7 @@
 package com.example.localvibes.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -226,9 +227,14 @@ fun CategoryButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
         onClick = onClick,
         shape = RoundedCornerShape(50),
         modifier = Modifier.height(32.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color =  Color(0xFF9D4EDD),
+        ),
         colors = if (isSelected) {
             ButtonDefaults.outlinedButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = Color(0xFF9D4EDD),
+
                 contentColor = Color.White
             )
         } else {
