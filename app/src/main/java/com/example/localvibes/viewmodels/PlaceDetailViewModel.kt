@@ -1,5 +1,5 @@
 package com.example.localvibes.viewmodels
-
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -18,11 +18,20 @@ import kotlinx.coroutines.launch
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarDuration
+import androidx.lifecycle.AndroidViewModel
 import com.example.localvibes.models.Place
+import com.example.localvibes.utils.FavoritesManager
 
-class PlaceDetailViewModel : ViewModel() {
+class PlaceDetailViewModel(application: Application) : AndroidViewModel(application){
     private val PlaceRepository = PlaceRepository(RetrofitInstance.placeApi)
     private val ReviewRepository = ReviewRepository(RetrofitInstance.placeApi)
+    private val favoritesManager = FavoritesManager(application)
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite: StateFlow<Boolean> get() = _isFavorite
+
+    fun initFavoriteState(placeId: String) {
+        _isFavorite.value = favoritesManager.isFavorite(placeId)
+    }
 
 
     val snackbarHostState = SnackbarHostState()
@@ -193,6 +202,30 @@ class PlaceDetailViewModel : ViewModel() {
             }
         }
         dismissDeletePlaceDialog()
+    }
+
+    fun toggleFavorite(placeId: String) {
+        viewModelScope.launch {
+            if (favoritesManager.isFavorite(placeId)) {
+                favoritesManager.removeFavorite(placeId)
+                _isFavorite.value = false
+                snackbarHostState.showSnackbar(
+                    message = "Místo bylo odebráno z oblíbených",
+                    duration = SnackbarDuration.Short
+                )
+            } else {
+                favoritesManager.addFavorite(placeId)
+                _isFavorite.value = true
+                snackbarHostState.showSnackbar(
+                    message = "Místo bylo přidáno do oblíbených",
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+    }
+
+    fun isFavorite(placeId: String): Boolean {
+        return favoritesManager.isFavorite(placeId)
     }
 
 }

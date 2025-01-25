@@ -177,6 +177,13 @@ fun PlacesScreen(
                         onClick = { viewModel.onCategorySelected("") }
                     )
                 }
+                item {
+                    CategoryButton(
+                        text = "Oblíbené",
+                        isSelected = viewState.value.selectedCategoryId == "favorites",
+                        onClick = { viewModel.onCategorySelected("favorites") }
+                    )
+                }
                 items(viewState.value.categories) { category ->
                     CategoryButton(
                         text = category.Name,
@@ -265,8 +272,10 @@ fun DashedLine() {
     }
 }
 
+/*
 @Composable
 @Preview
 fun PlacesScreenPreview() {
     PlacesScreen(navController = null, viewModel = PlacesViewModel())
 }
+ */

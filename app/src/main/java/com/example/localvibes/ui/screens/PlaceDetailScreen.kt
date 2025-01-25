@@ -19,6 +19,8 @@ import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
@@ -67,11 +69,14 @@ fun PlaceDetailScreen(
 
     LaunchedEffect(placeId) {
         placeDetailViewModel.initLoad(placeId)
+        placeDetailViewModel.initFavoriteState(placeId)
     }
 
     val viewState = placeDetailViewModel.viewState.collectAsState().value
     val isDialogOpen by placeDetailViewModel.isDialogOpen
     val isLoading by placeDetailViewModel.isLoading
+    val isFavorite by placeDetailViewModel.isFavorite.collectAsState()
+
 
     Scaffold(
         topBar = {
@@ -88,6 +93,12 @@ fun PlaceDetailScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = { placeDetailViewModel.toggleFavorite(placeId) }) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "Favorite"
+                        )
+                    }
                     IconButton(onClick = {
                         navController?.navigate("addPlaceScreen/${placeId}")
                     }) {
@@ -394,9 +405,10 @@ fun ReviewItem(
         }
     }
 }
-
+/*
 @Composable
 @Preview
 fun PlaceDetailScreenPreview() {
     PlaceDetailScreen(PlaceDetailViewModel(), null, "1")
 }
+*/

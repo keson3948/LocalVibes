@@ -26,9 +26,9 @@ class MainActivity : ComponentActivity() {
     private lateinit var addPlaceViewModel: AddPlaceViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        installSplashScreen()
 
         placesViewModel = ViewModelProvider(this)[PlacesViewModel::class.java]
         placeDetailViewModel = ViewModelProvider(this)[PlaceDetailViewModel::class.java]
@@ -40,12 +40,6 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 AppNavGraph(navController, placesViewModel, placeDetailViewModel, addPlaceViewModel)
             }
-        }
-
-        splashScreen.setKeepOnScreenCondition {
-            // Dočasně udržte splash screen po 2 sekundách pro testování
-            Thread.sleep(2000)
-            false
         }
     }
 }
